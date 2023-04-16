@@ -7,6 +7,7 @@ const config = {
   theme: {
     extend: {
       height: {
+        100: '25rem' /* 400px */,
         120: '30rem' /* 480px */,
       },
     },

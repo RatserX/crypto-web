@@ -4,6 +4,7 @@ const createData = () => {
   const initialValue = {
     aesMode: 'CBC',
     aesPadding: 'Pkcs7',
+    encoding: 'Utf8',
     hash: '',
     key: '',
     pbkdf2Iterations: -1,

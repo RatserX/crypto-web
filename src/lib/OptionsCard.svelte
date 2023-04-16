@@ -72,6 +72,17 @@
     { name: 'NoPadding', value: 'NoPadding' },
   ];
 
+  const encodingItems = [
+    { name: 'Base64', value: 'Base64' },
+    { name: 'Base64url', value: 'Base64url' },
+    { name: 'Hex', value: 'Hex' },
+    { name: 'Latin1', value: 'Latin1' },
+    { name: 'Utf8', value: 'Utf8' },
+    { name: 'Utf16', value: 'Utf16' },
+    { name: 'Utf16BE', value: 'Utf16BE' },
+    { name: 'Utf16LE', value: 'Utf16LE' },
+  ];
+
   const sha3OutputLengthItems = [
     { name: '224', value: 224 },
     { name: '256', value: 256 },
@@ -88,6 +99,7 @@
   $: isCypherAlgorithm = Object.values(cypherItems).some(
     (cypherItem) => cypherItem.value === selectedAlgorithm
   );
+
   $: isHashingAlgorithm = Object.values(hashingItems).some(
     (hashingItem) => hashingItem.value === selectedAlgorithm
   );
@@ -97,6 +109,7 @@
       aesMode: () => selectedAlgorithm !== 'AES' || Boolean($dataState.aesMode),
       aesPadding: () =>
         selectedAlgorithm !== 'AES' || Boolean($dataState.aesPadding),
+      encoding: () => isHashingAlgorithm || Boolean($dataState.encoding),
       key: () => isHashingAlgorithm || Boolean($dataState.key),
       pbkdf2Iterations: () =>
         selectedAlgorithm !== 'PBKDF2' || $dataState.pbkdf2Iterations >= 0,
@@ -116,7 +129,7 @@
     );
   }
 
-  const getCryptoArguments = () => {
+  const getCryptoArguments = (message) => {
     let cfg = {};
 
     switch (selectedAlgorithm) {
@@ -161,24 +174,24 @@
       case 'HMAC':
       case 'RC4':
       case 'TripleDES':
-        args = [$inputState, $dataState.key];
+        args = [message, $dataState.key];
         break;
       case 'SHA3':
-        args = [$inputState, !objectHelper.isEmpty(cfg) && cfg];
+        args = [message, !objectHelper.isEmpty(cfg) && cfg];
         break;
       case 'PBKDF2':
         args = [
-          $inputState,
+          message,
           $dataState.pbkdf2Salt,
           !objectHelper.isEmpty(cfg) && cfg,
         ];
         break;
       case 'AES':
       case 'RC4Drop':
-        args = [$inputState, $dataState.key, !objectHelper.isEmpty(cfg) && cfg];
+        args = [message, $dataState.key, !objectHelper.isEmpty(cfg) && cfg];
         break;
       default:
-        args = [$inputState];
+        args = [message];
         break;
     }
 
@@ -207,17 +220,18 @@
   };
 
   const handleDecryptClick = () => {
-    const args = getCryptoArguments();
+    const args = getCryptoArguments($inputState);
     const decrypted = CryptoJS[$dataState.standard]['decrypt'].apply(
       null,
       args
     );
 
-    $outputState = decrypted.toString(CryptoJS.enc.Utf8);
+    $outputState = CryptoJS.enc[$dataState.encoding].stringify(decrypted);
   };
 
   const handleEncryptClick = () => {
-    const args = getCryptoArguments();
+    const message = CryptoJS.enc[$dataState.encoding].parse($inputState);
+    const args = getCryptoArguments(message);
     const encrypted = CryptoJS[$dataState.standard]['encrypt'].apply(
       null,
       args
@@ -227,14 +241,14 @@
   };
 
   const handleHashClick = () => {
-    const args = getCryptoArguments();
+    const args = getCryptoArguments($inputState);
     const hashed = CryptoJS[$dataState.standard].apply(null, args);
 
     $outputState = hashed.toString();
   };
 
   const handleValidateClick = () => {
-    const args = getCryptoArguments();
+    const args = getCryptoArguments($inputState);
     const hashed = CryptoJS[$dataState.standard].apply(null, args);
 
     if ($dataState.hash === hashed.toString()) {
@@ -249,9 +263,9 @@
   };
 </script>
 
-<Card class="lg:h-120" size="100%">
+<Card class="lg:h-100" size="100%">
   <form>
-    <div class="grid gap-4">
+    <div class="grid grid-cols-2 gap-4">
       <div>
         <Label>Algorithm</Label>
         <Select
@@ -262,18 +276,17 @@
           on:change={handleAlgorithmChange}
         />
       </div>
-      {#if hasVariant}
-        <div>
-          <Label>Variant</Label>
-          <Select
-            items={variantItems}
-            required
-            title="Variant"
-            bind:value={selectedVariant}
-            on:change={handleVariantChange}
-          />
-        </div>
-      {/if}
+      <div>
+        <Label>Variant</Label>
+        <Select
+          disabled={!hasVariant}
+          items={variantItems}
+          required
+          title="Variant"
+          bind:value={selectedVariant}
+          on:change={handleVariantChange}
+        />
+      </div>
       {#if selectedAlgorithm === 'AES'}
         <div>
           <Label>Mode</Label>
@@ -307,19 +320,19 @@
           <Label>Key Size</Label>
           <Input required type="number" bind:value={$dataState.pbkdf2KeySize} />
         </div>
-        <div>
+        <div class="col-span-2">
           <Label>Salt</Label>
           <Input required type="text" bind:value={$dataState.pbkdf2Salt} />
         </div>
       {/if}
       {#if selectedAlgorithm === 'RC4Drop'}
-        <div>
+        <div class="col-span-2">
           <Label>Drop</Label>
           <Input required type="number" bind:value={$dataState.rc4DropDrop} />
         </div>
       {/if}
       {#if selectedAlgorithm === 'SHA3'}
-        <div>
+        <div class="col-span-2">
           <Label>Output Length</Label>
           <Select
             items={sha3OutputLengthItems}
@@ -330,19 +343,28 @@
         </div>
       {/if}
       {#if isHashingAlgorithm}
-        <div>
+        <div class="col-span-2">
           <Label>Hash</Label>
           <Input type="text" bind:value={$dataState.hash} />
         </div>
       {/if}
       {#if isCypherAlgorithm}
         <div>
+          <Label>Encoding</Label>
+          <Select
+            items={encodingItems}
+            required
+            title="Encoding"
+            bind:value={$dataState.encoding}
+          />
+        </div>
+        <div>
           <Label>Key</Label>
           <Input type="text" bind:value={$dataState.key} />
         </div>
       {/if}
       {#if isCypherAlgorithm || isHashingAlgorithm}
-        <div>
+        <div class="col-span-2">
           <ButtonGroup class="w-full">
             {#if isHashingAlgorithm}
               <Button
