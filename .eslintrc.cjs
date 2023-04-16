@@ -5,12 +5,15 @@ module.exports = {
     },
     "extends": [
         "eslint:recommended",
-        "plugin:svelte/recommended"
+        "plugin:import/recommended",
+        "plugin:svelte/recommended",
+        "prettier"
     ],
     "parserOptions": {
         "ecmaVersion": "latest",
         "sourceType": "module"
     },
+    "plugins": ["import"],
     "rules": {
         "semi": ["error", "always"],
         "quotes": ["error", "double"]

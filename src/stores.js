@@ -22,7 +22,7 @@ const createOptionsStore = () => {
         set,
         subscribe
     };
-}
+};
 
 export const optionsStore = createOptionsStore();
 

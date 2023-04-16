@@ -20,6 +20,6 @@ const createData = () => {
         set,
         subscribe
     };
-}
+};
 
 export const dataState = createData();
