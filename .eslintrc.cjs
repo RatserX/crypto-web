@@ -16,6 +16,16 @@ module.exports = {
     "plugins": ["import"],
     "rules": {
         "semi": ["error", "always"],
-        "quotes": ["error", "double"]
+        "quotes": ["error", "double"],
+        "import/no-unresolved": "warn",
+        'import/order': [
+          'warn',
+          {
+            "alphabetize": {
+              "order": 'asc',
+            },
+            'newlines-between': 'always',
+          },
+        ],
     }
 }
