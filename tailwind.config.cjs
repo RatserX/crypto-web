@@ -5,7 +5,11 @@ const config = {
   ],
 
   theme: {
-    extend: {},
+    extend: {
+      height: {
+        "120": "30rem" /* 480px */
+      }
+    },
   },
 
   plugins: [
