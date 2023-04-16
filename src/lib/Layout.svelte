@@ -1,5 +1,6 @@
 <script>
     import { Footer, FooterCopyright, FooterLinkGroup, FooterLink, NavBrand, Navbar, Span } from "flowbite-svelte";
+
     import InputCard from "./InputCard.svelte";
     import OptionsCard from "./OptionsCard.svelte";
     import OutputCard from "./OutputCard.svelte";

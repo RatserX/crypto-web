@@ -8,6 +8,7 @@ module.exports = {
     'eslint:recommended',
     'plugin:import/recommended',
     'plugin:svelte/recommended',
+    'plugin:svelte/prettier',
     'prettier',
   ],
   parserOptions: {
@@ -18,6 +19,7 @@ module.exports = {
   rules: {
     semi: ['error', 'always'],
     quotes: ['error', 'double'],
+    'import/default': 'warn',
     'import/no-unresolved': 'warn',
     'import/order': [
       'warn',

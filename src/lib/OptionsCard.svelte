@@ -1,10 +1,11 @@
 <script>
     import CryptoJS from "crypto-js";
     import { Button, ButtonGroup, Card, Input, Label, Select } from "flowbite-svelte";
+
+    import objectHelper from "../helpers/object-helper";
     import { inputState } from "../stores/input-store";
     import { dataState } from "../stores/options-store";
     import { outputState } from "../stores/output-store";
-    import objectHelper from "../helpers/object-helper";
     
     const hashingItems = [
         { name: "MD5", value: "MD5" },
@@ -102,34 +103,30 @@
         switch (selectedAlgorithm)
         {
             case "AES":
-                const aesCfg = {
+                cfg = {
                     mode: CryptoJS.mode[$dataState.aesMode],
                     padding: CryptoJS.pad[$dataState.aesPadding]
                 };
-
-                cfg = aesCfg;
+                
                 break;
             case "SHA3":
-                const sha3Cfg = {
+                cfg = {
                     outputLength: $dataState.sha3OutputLength
                 };
                 
-                cfg = sha3Cfg;
                 break;
             case "PBKDF2":
-                const pbkdf2Cfg = {
+                cfg = {
                     ...($dataState.pbkdf2Iterations >= 0 && { iterations: $dataState.pbkdf2Iterations }),
                     ...($dataState.pbkdf2KeySize >= 0 && { keySize: $dataState.pbkdf2KeySize })
                 };
                 
-                cfg = pbkdf2Cfg;
                 break;
             case "RC4Drop":
-                const rc4DropCfg = {
+                cfg = {
                     drop: $dataState.rc4DropDrop
                 };
                 
-                cfg = rc4DropCfg;
                 break;
             default:
                 break;
@@ -149,9 +146,6 @@
                 args = [$inputState, (!objectHelper.isEmpty(cfg) && cfg)];
                 break;
             case "PBKDF2":
-                const salt = CryptoJS.lib.WordArray.random(128 / 8);
-                console.log("lasal")
-                console.log(salt.toString());
                 args = [$inputState, $dataState.pbkdf2Salt, (!objectHelper.isEmpty(cfg) && cfg)];
                 break;
             case "AES":
@@ -164,7 +158,7 @@
         };
 
         return args;
-    }
+    };
     
     const handleAlgorithmChange = () => {
         switch (selectedAlgorithm)
@@ -185,28 +179,28 @@
 
         const firstVariant = variantItems[0];
         if (firstVariant) $dataState.standard = selectedVariant = firstVariant.value;
-    }
+    };
 
     const handleDecryptClick = () => {
         const args = getCryptoArguments();
         const decrypted = CryptoJS[$dataState.standard]["decrypt"].apply(null, args);
 
         $outputState = decrypted.toString(CryptoJS.enc.Utf8);
-    }
+    };
 
     const handleEncryptClick = () => {
         const args = getCryptoArguments();
         const encrypted = CryptoJS[$dataState.standard]["encrypt"].apply(null, args);
 
         $outputState = encrypted.toString();
-    }
+    };
 
     const handleHashClick = () => {
         const args = getCryptoArguments();
         const hashed = CryptoJS[$dataState.standard].apply(null, args);
 
         $outputState = hashed.toString();
-    }
+    };
 
     const handleValidateClick = () => {
         const args = getCryptoArguments();
@@ -217,11 +211,11 @@
         } else {
             $outputState = "Hash does not match the input text.";
         }
-    }
+    };
 
     const handleVariantChange = () => {
         $dataState.standard = selectedVariant;
-    }
+    };
 </script>
 
 <Card class="lg:h-120" size="100%">

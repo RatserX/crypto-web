@@ -1,6 +1,7 @@
 <script>
     import { Card, Span, Textarea, Toolbar, ToolbarButton } from "flowbite-svelte";
     import { Clipboard } from "svelte-heros-v2";
+
     import { inputState } from "../stores/input-store";
 </script>
 

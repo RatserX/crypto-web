@@ -8,8 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "cleanup": "npm run lint && npm run format",
-    "format": "prettier --write ./**/*.{cjs,js}",
-    "lint": "eslint ./**/*.{cjs,js} --fix"
+    "format": "prettier --write ./**/*.{cjs,js,html}",
+    "lint": "eslint ./**/*.{cjs,js,html} --fix"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.0.3",
@@ -22,6 +22,7 @@
     "postcss": "^8.4.14",
     "postcss-load-config": "^4.0.1",
     "prettier": "2.8.7",
+    "prettier-plugin-svelte": "^2.10.0",
     "svelte": "^3.55.1",
     "svelte-heros-v2": "^0.4.2",
     "svelte-preprocess": "^4.10.7",
