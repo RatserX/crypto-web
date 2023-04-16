@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "cleanup": "npm run lint && npm run format",
     "format": "prettier --write ./**/*.{cjs,js,svelte}",
-    "lint": "eslint ./**/*.{cjs,js} --fix"
+    "lint": "eslint ./**/*.{cjs,js,svelte} --fix"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.0.3",

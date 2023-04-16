@@ -6,7 +6,6 @@ module.exports = {
   },
   extends: [
     'eslint:recommended',
-    'plugin:import/recommended',
     'plugin:svelte/recommended',
     'plugin:svelte/prettier',
     'prettier',
@@ -21,6 +20,12 @@ module.exports = {
     quotes: ['error', 'double'],
     'import/default': 'warn',
     'import/no-unresolved': 'warn',
+    'import/no-unused-modules': [
+      'warn',
+      {
+        unusedExports: true,
+      },
+    ],
     'import/order': [
       'warn',
       {
