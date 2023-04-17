@@ -37,5 +37,6 @@
     "crypto-js": "^4.1.1",
     "flowbite": "^1.6.4",
     "flowbite-svelte": "^0.34.7"
-  }
+  },
+  "homepage": "https://ratser.github.io/crypto-web"
 }
