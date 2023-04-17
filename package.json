@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "npx gh-pages -d dist",
+    "deploy": "gh-pages -d dist",
     "cleanup": "npm run lint && npm run format",
     "format": "prettier --write ./**/*.{cjs,js,svelte}",
     "lint": "eslint ./**/*.{cjs,js,svelte} --fix"
