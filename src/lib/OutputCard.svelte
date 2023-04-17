@@ -12,15 +12,15 @@
 
   import { outputState } from '../stores/output-store';
 
-  let copyToastOpen = false;
+  let successfulCopyToastOpen = false;
 
   const handleCopyClick = () => {
-    navigator.clipboard.writeText($outputState).then(_ => {
-      if (copyToastOpen) return;
-      copyToastOpen = true;
+    navigator.clipboard.writeText($outputState).then((_) => {
+      if (successfulCopyToastOpen) return;
+      successfulCopyToastOpen = true;
 
       setTimeout(() => {
-        copyToastOpen = false;
+        successfulCopyToastOpen = false;
       }, 5000);
     });
   };
@@ -42,7 +42,13 @@
     </Toolbar>
   </Textarea>
 </Card>
-<Toast params="{{y: 200}}" position="top-right" transition={fly} bind:open={copyToastOpen}>
+<Toast
+  color="green"
+  params={{ y: 200 }}
+  position="top-right"
+  transition={fly}
+  bind:open={successfulCopyToastOpen}
+>
   <svelte:fragment slot="icon">
     <Document />
   </svelte:fragment>

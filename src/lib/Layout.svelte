@@ -24,7 +24,9 @@
     class="grid grid-cols-1 lg:grid-cols-2 gap-4 px-8 lg:px-20 py-4 lg:py-10"
   >
     <p class="lg:col-span-2 font-thin dark:text-white">
-        Crypto is an online tool that tries to serve as a demo for all the standard and secure cryptographic algorithms provided in the JavaScript library CryptoJS.
+      Crypto is an online tool that tries to serve as a demo for all the
+      standard and secure cryptographic algorithms provided in the JavaScript
+      library CryptoJS.
     </p>
     <div>
       <OptionsCard />

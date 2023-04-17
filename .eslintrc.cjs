@@ -35,5 +35,11 @@ module.exports = {
         'newlines-between': 'always',
       },
     ],
+    'no-unused-vars': [
+      'error',
+      {
+        argsIgnorePattern: '^_',
+      },
+    ],
   },
 };
