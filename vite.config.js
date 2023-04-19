@@ -4,5 +4,5 @@ import { defineConfig } from 'vite';
 // https://vitejs.dev/config/
 export default defineConfig({
   base: '/crypto-web/',
-  plugins: [svelte()],
+  plugins: [svelte({ hot: !process.env.VITEST })],
 });

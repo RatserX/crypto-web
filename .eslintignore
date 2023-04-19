@@ -1,6 +1,5 @@
 /build/**
 /coverage/**
-/dist/**
 /docs/*
 !/docs/*.js
 !/docs/tools/
@@ -13,3 +12,4 @@
 /tools/internal-rules/node_modules/**
 test.js
 !.eslintrc.js
+/dist/**
