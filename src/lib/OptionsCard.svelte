@@ -8,79 +8,81 @@
     Label,
     Select,
   } from 'flowbite-svelte';
+  import { onMount } from 'svelte';
 
-  import objectHelper from '../helpers/object-helper';
   import { inputState } from '../stores/input-store';
   import { dataState } from '../stores/options-store';
   import { outputState } from '../stores/output-store';
+    import { AES_MODE, AES_PADDING, CYPHER_ALGORITHM, ENCODING, HASHING_ALGORITHM, HMAC_VARIANT, SHA2_VARIANT } from '../utils/constants';
+    import { isObjectEmpty } from '../utils/helpers';
 
-  const hashingItems = [
-    { name: 'MD5', value: 'MD5' },
-    { name: 'SHA-1', value: 'SHA1' },
-    { name: 'SHA-2', value: 'SHA2' },
-    { name: 'SHA-3', value: 'SHA3' },
-    { name: 'RIPEMD160', value: 'RIPEMD160' },
-    { name: 'HMAC', value: 'HMAC' },
-    { name: 'PBKDF2', value: 'PBKDF2' },
+  const hashingAlgorithmItems = [
+    { name: 'MD5', value: HASHING_ALGORITHM.md5 },
+    { name: 'SHA-1', value: HASHING_ALGORITHM.sha1 },
+    { name: 'SHA-2', value: HASHING_ALGORITHM.sha2 },
+    { name: 'SHA-3', value: HASHING_ALGORITHM.sha3 },
+    { name: 'RIPEMD160', value: HASHING_ALGORITHM.ripemd160 },
+    { name: 'HMAC', value: HASHING_ALGORITHM.hmac },
+    { name: 'PBKDF2', value: HASHING_ALGORITHM.pbkdf2 },
   ];
 
-  const cypherItems = [
-    { name: 'AES', value: 'AES' },
-    { name: 'DES', value: 'DES' },
-    { name: 'Triple DES', value: 'TripleDES' },
-    { name: 'Rabbit', value: 'Rabbit' },
-    { name: 'RC4', value: 'RC4' },
-    { name: 'RC4Drop', value: 'RC4Drop' },
+  const cypherAlgorithmItems = [
+    { name: 'AES', value: CYPHER_ALGORITHM.aes },
+    { name: 'DES', value: CYPHER_ALGORITHM.des },
+    { name: 'Triple DES', value: CYPHER_ALGORITHM.tripleDes },
+    { name: 'Rabbit', value: CYPHER_ALGORITHM.rabbit },
+    { name: 'RC4', value: CYPHER_ALGORITHM.rc4 },
+    { name: 'RC4Drop', value: CYPHER_ALGORITHM.rc4Drop },
   ];
 
-  const algorithmItems = hashingItems.concat(cypherItems);
+  const algorithmItems = hashingAlgorithmItems.concat(cypherAlgorithmItems);
 
   const hmacVariantItems = [
-    { name: 'HmacMD5', value: 'HmacMD5' },
-    { name: 'HmacRIPEMD160', value: 'HmacRIPEMD160' },
-    { name: 'HmacSHA1', value: 'HmacSHA1' },
-    { name: 'HmacSHA224', value: 'HmacSHA224' },
-    { name: 'HmacSHA256', value: 'HmacSHA256' },
-    { name: 'HmacSHA3', value: 'HmacSHA3' },
-    { name: 'HmacSHA384', value: 'HmacSHA384' },
-    { name: 'HmacSHA512', value: 'HmacSHA512' },
+    { name: 'HmacMD5', value: HMAC_VARIANT.hmacMd5 },
+    { name: 'HmacRIPEMD160', value: HMAC_VARIANT.hmacRipemd160 },
+    { name: 'HmacSHA1', value: HMAC_VARIANT.hmacSha1 },
+    { name: 'HmacSHA224', value: HMAC_VARIANT.hmacSha224 },
+    { name: 'HmacSHA256', value: HMAC_VARIANT.hmacSha256 },
+    { name: 'HmacSHA3', value: HMAC_VARIANT.hmacSha3 },
+    { name: 'HmacSHA384', value: HMAC_VARIANT.hmacSha384 },
+    { name: 'HmacSHA512', value: HMAC_VARIANT.hmacSha512 },
   ];
 
   const sha2VariantItems = [
-    { name: 'SHA-224', value: 'SHA224' },
-    { name: 'SHA-256', value: 'SHA256' },
-    { name: 'SHA-384', value: 'SHA384' },
-    { name: 'SHA-512', value: 'SHA512' },
+    { name: 'SHA-224', value: SHA2_VARIANT.sha224 },
+    { name: 'SHA-256', value: SHA2_VARIANT.sha256 },
+    { name: 'SHA-384', value: SHA2_VARIANT.sha384 },
+    { name: 'SHA-512', value: SHA2_VARIANT.sha512 },
   ];
 
   let variantItems = [];
 
   const aesModeItems = [
-    { name: 'CBC', value: 'CBC' },
-    { name: 'CFB', value: 'CFB' },
-    { name: 'CTR', value: 'CTR' },
-    { name: 'OFB', value: 'OFB' },
-    { name: 'ECB', value: 'ECB' },
+    { name: 'CBC', value: AES_MODE.cbc },
+    { name: 'CFB', value: AES_MODE.cfb },
+    { name: 'CTR', value: AES_MODE.ctr },
+    { name: 'OFB', value: AES_MODE.ofb },
+    { name: 'ECB', value: AES_MODE.ecb },
   ];
 
   const aesPaddingItems = [
-    { name: 'Pkcs7', value: 'Pkcs7' },
-    { name: 'Iso97971', value: 'Iso97971' },
-    { name: 'AnsiX923', value: 'AnsiX923' },
-    { name: 'Iso10126', value: 'Iso10126' },
-    { name: 'ZeroPadding', value: 'ZeroPadding' },
-    { name: 'NoPadding', value: 'NoPadding' },
+    { name: 'Pkcs7', value: AES_PADDING.pkcs7 },
+    { name: 'Iso97971', value: AES_PADDING.iso97971 },
+    { name: 'AnsiX923', value: AES_PADDING.ansiX923 },
+    { name: 'Iso10126', value: AES_PADDING.iso10126 },
+    { name: 'ZeroPadding', value: AES_PADDING.zeroPadding },
+    { name: 'NoPadding', value: AES_PADDING.noPadding },
   ];
 
   const encodingItems = [
-    { name: 'Base64', value: 'Base64' },
-    { name: 'Base64url', value: 'Base64url' },
-    { name: 'Hex', value: 'Hex' },
-    { name: 'Latin1', value: 'Latin1' },
-    { name: 'Utf8', value: 'Utf8' },
-    { name: 'Utf16', value: 'Utf16' },
-    { name: 'Utf16BE', value: 'Utf16BE' },
-    { name: 'Utf16LE', value: 'Utf16LE' },
+    { name: 'Base64', value: ENCODING.base64 },
+    { name: 'Base64url', value: ENCODING.base64url },
+    { name: 'Hex', value: ENCODING.hex },
+    { name: 'Latin1', value: ENCODING.latin1 },
+    { name: 'Utf8', value: ENCODING.utf8 },
+    { name: 'Utf16', value: ENCODING.utf16 },
+    { name: 'Utf16BE', value: ENCODING.utf16BE },
+    { name: 'Utf16LE', value: ENCODING.utf16LE },
   ];
 
   const sha3OutputLengthItems = [
@@ -96,12 +98,12 @@
   let isValid = false;
 
   $: hasVariant = variantItems.length;
-  $: isCypherAlgorithm = Object.values(cypherItems).some(
-    (cypherItem) => cypherItem.value === selectedAlgorithm
+  $: isCypherAlgorithm = Object.values(cypherAlgorithmItems).some(
+    (cypherAlgorithmItem) => cypherAlgorithmItem.value === selectedAlgorithm
   );
 
-  $: isHashingAlgorithm = Object.values(hashingItems).some(
-    (hashingItem) => hashingItem.value === selectedAlgorithm
+  $: isHashingAlgorithm = Object.values(hashingAlgorithmItems).some(
+    (hashingAlgorithmItem) => hashingAlgorithmItem.value === selectedAlgorithm
   );
 
   $: {
@@ -177,18 +179,18 @@
         args = [message, $dataState.key];
         break;
       case 'SHA3':
-        args = [message, !objectHelper.isEmpty(cfg) && cfg];
+        args = [message, !isObjectEmpty(cfg) && cfg];
         break;
       case 'PBKDF2':
         args = [
           message,
           $dataState.pbkdf2Salt,
-          !objectHelper.isEmpty(cfg) && cfg,
+          !isObjectEmpty(cfg) && cfg,
         ];
         break;
       case 'AES':
       case 'RC4Drop':
-        args = [message, $dataState.key, !objectHelper.isEmpty(cfg) && cfg];
+        args = [message, $dataState.key, !isObjectEmpty(cfg) && cfg];
         break;
       default:
         args = [message];
@@ -261,6 +263,32 @@
   const handleVariantChange = () => {
     $dataState.standard = selectedVariant;
   };
+
+  onMount(() => {
+    const isAlgorithm = algorithmItems.some(
+      (algorithmItem) => algorithmItem.value === $dataState.standard
+    );
+
+    if (isAlgorithm) {
+      selectedAlgorithm = $dataState.standard;
+      return;
+    }
+    console.log(selectedAlgorithm);
+
+    const isHmacVariant = hmacVariantItems.some(
+      (hmacVariantItem) => hmacVariantItem.value === $dataState.standard
+    );
+
+    const isSha2Variant = sha2VariantItems.some(
+      (sha2VariantItem) => sha2VariantItem.value === $dataState.standard
+    );
+
+    const isVariant = isHmacVariant || isSha2Variant;
+    if (isVariant) selectedVariant = $dataState.standard;
+
+    if (isHmacVariant) selectedAlgorithm = 'HMAC';
+    else if (isSha2Variant) selectedAlgorithm = 'SHA2';
+  });
 </script>
 
 <Card class="lg:h-100" size="100%">

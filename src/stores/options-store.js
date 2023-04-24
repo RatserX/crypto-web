@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 
 const createData = () => {
   const initialValue = {
@@ -15,11 +15,11 @@ const createData = () => {
     standard: null,
   };
 
-  const { set, subscribe } = writable(initialValue);
+  const data = writable(initialValue);
   return {
-    reset: () => set(initialValue),
-    set,
-    subscribe,
+    ...data,
+    get: () => get(data),
+    reset: () => data.set(initialValue),
   };
 };
 

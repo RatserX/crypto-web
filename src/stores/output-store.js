@@ -1,3 +1,14 @@
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 
-export const outputState = writable('');
+const createData = () => {
+  const initialValue = '';
+
+  const data = writable(initialValue);
+  return {
+    ...data,
+    get: () => get(data),
+    reset: () => data.set(initialValue),
+  };
+};
+
+export const outputState = createData();
