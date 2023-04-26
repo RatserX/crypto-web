@@ -40,3 +40,30 @@ h1 {
 @tailwind components;
 
 @tailwind utilities;
+
+@layer components {
+  .svelte-select {
+    @apply text-gray-900 bg-gray-50 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white !important
+  }
+
+  .svelte-select.focused {
+    @apply ring-blue-500 border-blue-500 dark:ring-blue-500 dark:border-blue-500 !important
+  }
+
+  .svelte-select > .svelte-select-list {
+    @apply bg-gray-50 dark:bg-gray-700 !important;
+  }
+
+  .svelte-select > .svelte-select-list > .list-item > .item:active,
+  .svelte-select > .svelte-select-list > .list-item > .item.active {
+    @apply bg-gray-50 text-gray-900 dark:bg-gray-700 dark:text-white !important;
+  }
+
+  .svelte-select > .svelte-select-list > .list-item > .item.hover {
+    @apply bg-gray-700 text-white dark:bg-gray-50 dark:text-gray-900 !important;
+  }
+
+  .svelte-select:not(.disabled) > .value-container > input::placeholder {
+    @apply text-gray-900 dark:text-white !important;
+  }
+}

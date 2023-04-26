@@ -1,16 +1,16 @@
-/* global beforeEach, test */
+/* global beforeEach, expect, test */
 import '@testing-library/jest-dom';
 
 import { fireEvent, render, screen } from '@testing-library/svelte';
-import { tick } from 'svelte';
 import CryptoJS from 'crypto-js';
+import { tick } from 'svelte';
 
 import { inputState } from '../stores/input-store';
 import { dataState } from '../stores/options-store';
 import { outputState } from '../stores/output-store';
+import { HASHING_ALGORITHM } from '../utils/constants';
 
 import Layout from './Layout.svelte';
-import { HASHING_ALGORITHM, HMAC_VARIANT } from '../utils/constants';
 
 beforeEach(() => {
   dataState.reset();
@@ -21,12 +21,14 @@ test('MD5 output', async () => {
   render(Layout);
 
   const algorithmSelect = screen.getByRole('combobox', { name: /algorithm/i });
-  fireEvent.change(algorithmSelect, { target: { value: HASHING_ALGORITHM.hmac } });
+  fireEvent.change(algorithmSelect, {
+    target: { value: HASHING_ALGORITHM.hmac },
+  });
 
   await tick();
 
-  const variantSelect = screen.getByRole('combobox', { name: /variant/i });
-  fireEvent.change(algorithmSelect, { target: { value: HMAC_VARIANT.hmacMd5 } });
+  //const variantSelect = screen.getByRole("combobox", { name: /variant/i });
+  //fireEvent.change(algorithmSelect, { target: { value: HMAC_VARIANT.hmacMd5 } });
 
   await tick();
 

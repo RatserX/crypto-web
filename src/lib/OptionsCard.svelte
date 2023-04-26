@@ -1,95 +1,105 @@
 <script>
   import CryptoJS from 'crypto-js';
-  import {
-    Button,
-    ButtonGroup,
-    Card,
-    Input,
-    Label,
-    Select,
-  } from 'flowbite-svelte';
+  import { Button, ButtonGroup, Card, Input, Label } from 'flowbite-svelte';
   import { onMount } from 'svelte';
+  import Select from 'svelte-select';
 
   import { inputState } from '../stores/input-store';
   import { dataState } from '../stores/options-store';
   import { outputState } from '../stores/output-store';
-    import { AES_MODE, AES_PADDING, CYPHER_ALGORITHM, ENCODING, HASHING_ALGORITHM, HMAC_VARIANT, SHA2_VARIANT } from '../utils/constants';
-    import { isObjectEmpty } from '../utils/helpers';
+  import {
+    AES_MODE,
+    AES_PADDING,
+    CYPHER_ALGORITHM,
+    ENCODING,
+    HASHING_ALGORITHM,
+    HMAC_VARIANT,
+    SHA2_VARIANT,
+  } from '../utils/constants';
+  import { isObjectEmpty } from '../utils/helpers';
 
   const hashingAlgorithmItems = [
-    { name: 'MD5', value: HASHING_ALGORITHM.md5 },
-    { name: 'SHA-1', value: HASHING_ALGORITHM.sha1 },
-    { name: 'SHA-2', value: HASHING_ALGORITHM.sha2 },
-    { name: 'SHA-3', value: HASHING_ALGORITHM.sha3 },
-    { name: 'RIPEMD160', value: HASHING_ALGORITHM.ripemd160 },
-    { name: 'HMAC', value: HASHING_ALGORITHM.hmac },
-    { name: 'PBKDF2', value: HASHING_ALGORITHM.pbkdf2 },
+    { group: 'Hashing', label: 'MD5', value: HASHING_ALGORITHM.md5 },
+    { group: 'Hashing', label: 'SHA-1', value: HASHING_ALGORITHM.sha1 },
+    { group: 'Hashing', label: 'SHA-2', value: HASHING_ALGORITHM.sha2 },
+    { group: 'Hashing', label: 'SHA-3', value: HASHING_ALGORITHM.sha3 },
+    {
+      group: 'Hashing',
+      label: 'RIPEMD160',
+      value: HASHING_ALGORITHM.ripemd160,
+    },
+    { group: 'Hashing', label: 'HMAC', value: HASHING_ALGORITHM.hmac },
+    { group: 'Hashing', label: 'PBKDF2', value: HASHING_ALGORITHM.pbkdf2 },
   ];
 
   const cypherAlgorithmItems = [
-    { name: 'AES', value: CYPHER_ALGORITHM.aes },
-    { name: 'DES', value: CYPHER_ALGORITHM.des },
-    { name: 'Triple DES', value: CYPHER_ALGORITHM.tripleDes },
-    { name: 'Rabbit', value: CYPHER_ALGORITHM.rabbit },
-    { name: 'RC4', value: CYPHER_ALGORITHM.rc4 },
-    { name: 'RC4Drop', value: CYPHER_ALGORITHM.rc4Drop },
+    { group: 'Cyphers', label: 'AES', value: CYPHER_ALGORITHM.aes },
+    { group: 'Cyphers', label: 'DES', value: CYPHER_ALGORITHM.des },
+    {
+      group: 'Cyphers',
+      label: 'Triple DES',
+      value: CYPHER_ALGORITHM.tripleDes,
+    },
+    { group: 'Cyphers', label: 'Rabbit', value: CYPHER_ALGORITHM.rabbit },
+    { group: 'Cyphers', label: 'RC4', value: CYPHER_ALGORITHM.rc4 },
+    { group: 'Cyphers', label: 'RC4Drop', value: CYPHER_ALGORITHM.rc4Drop },
   ];
 
   const algorithmItems = hashingAlgorithmItems.concat(cypherAlgorithmItems);
 
   const hmacVariantItems = [
-    { name: 'HmacMD5', value: HMAC_VARIANT.hmacMd5 },
-    { name: 'HmacRIPEMD160', value: HMAC_VARIANT.hmacRipemd160 },
-    { name: 'HmacSHA1', value: HMAC_VARIANT.hmacSha1 },
-    { name: 'HmacSHA224', value: HMAC_VARIANT.hmacSha224 },
-    { name: 'HmacSHA256', value: HMAC_VARIANT.hmacSha256 },
-    { name: 'HmacSHA3', value: HMAC_VARIANT.hmacSha3 },
-    { name: 'HmacSHA384', value: HMAC_VARIANT.hmacSha384 },
-    { name: 'HmacSHA512', value: HMAC_VARIANT.hmacSha512 },
+    { label: 'HmacMD5', value: HMAC_VARIANT.hmacMd5 },
+    { label: 'HmacRIPEMD160', value: HMAC_VARIANT.hmacRipemd160 },
+    { label: 'HmacSHA1', value: HMAC_VARIANT.hmacSha1 },
+    { label: 'HmacSHA224', value: HMAC_VARIANT.hmacSha224 },
+    { label: 'HmacSHA256', value: HMAC_VARIANT.hmacSha256 },
+    { label: 'HmacSHA3', value: HMAC_VARIANT.hmacSha3 },
+    { label: 'HmacSHA384', value: HMAC_VARIANT.hmacSha384 },
+    { label: 'HmacSHA512', value: HMAC_VARIANT.hmacSha512 },
   ];
 
   const sha2VariantItems = [
-    { name: 'SHA-224', value: SHA2_VARIANT.sha224 },
-    { name: 'SHA-256', value: SHA2_VARIANT.sha256 },
-    { name: 'SHA-384', value: SHA2_VARIANT.sha384 },
-    { name: 'SHA-512', value: SHA2_VARIANT.sha512 },
+    { label: 'SHA-224', value: SHA2_VARIANT.sha224 },
+    { label: 'SHA-256', value: SHA2_VARIANT.sha256 },
+    { label: 'SHA-384', value: SHA2_VARIANT.sha384 },
+    { label: 'SHA-512', value: SHA2_VARIANT.sha512 },
   ];
 
   let variantItems = [];
 
   const aesModeItems = [
-    { name: 'CBC', value: AES_MODE.cbc },
-    { name: 'CFB', value: AES_MODE.cfb },
-    { name: 'CTR', value: AES_MODE.ctr },
-    { name: 'OFB', value: AES_MODE.ofb },
-    { name: 'ECB', value: AES_MODE.ecb },
+    { label: 'CBC', value: AES_MODE.cbc },
+    { label: 'CFB', value: AES_MODE.cfb },
+    { label: 'CTR', value: AES_MODE.ctr },
+    { label: 'OFB', value: AES_MODE.ofb },
+    { label: 'ECB', value: AES_MODE.ecb },
   ];
 
   const aesPaddingItems = [
-    { name: 'Pkcs7', value: AES_PADDING.pkcs7 },
-    { name: 'Iso97971', value: AES_PADDING.iso97971 },
-    { name: 'AnsiX923', value: AES_PADDING.ansiX923 },
-    { name: 'Iso10126', value: AES_PADDING.iso10126 },
-    { name: 'ZeroPadding', value: AES_PADDING.zeroPadding },
-    { name: 'NoPadding', value: AES_PADDING.noPadding },
+    { label: 'Pkcs7', value: AES_PADDING.pkcs7 },
+    { label: 'Iso97971', value: AES_PADDING.iso97971 },
+    { label: 'AnsiX923', value: AES_PADDING.ansiX923 },
+    { label: 'Iso10126', value: AES_PADDING.iso10126 },
+    { label: 'ZeroPadding', value: AES_PADDING.zeroPadding },
+    { label: 'NoPadding', value: AES_PADDING.noPadding },
   ];
 
   const encodingItems = [
-    { name: 'Base64', value: ENCODING.base64 },
-    { name: 'Base64url', value: ENCODING.base64url },
-    { name: 'Hex', value: ENCODING.hex },
-    { name: 'Latin1', value: ENCODING.latin1 },
-    { name: 'Utf8', value: ENCODING.utf8 },
-    { name: 'Utf16', value: ENCODING.utf16 },
-    { name: 'Utf16BE', value: ENCODING.utf16BE },
-    { name: 'Utf16LE', value: ENCODING.utf16LE },
+    { label: 'Base64', value: ENCODING.base64 },
+    { label: 'Base64url', value: ENCODING.base64url },
+    { label: 'Hex', value: ENCODING.hex },
+    { label: 'Latin1', value: ENCODING.latin1 },
+    { label: 'Utf8', value: ENCODING.utf8 },
+    { label: 'Utf16', value: ENCODING.utf16 },
+    { label: 'Utf16BE', value: ENCODING.utf16BE },
+    { label: 'Utf16LE', value: ENCODING.utf16LE },
   ];
 
   const sha3OutputLengthItems = [
-    { name: '224', value: 224 },
-    { name: '256', value: 256 },
-    { name: '384', value: 384 },
-    { name: '512', value: 512 },
+    { label: '224', value: 224 },
+    { label: '256', value: 256 },
+    { label: '384', value: 384 },
+    { label: '512', value: 512 },
   ];
 
   let selectedAlgorithm;
@@ -97,7 +107,7 @@
 
   let isValid = false;
 
-  $: hasVariant = variantItems.length;
+  $: hasVariant = Boolean(variantItems.length);
   $: isCypherAlgorithm = Object.values(cypherAlgorithmItems).some(
     (cypherAlgorithmItem) => cypherAlgorithmItem.value === selectedAlgorithm
   );
@@ -108,21 +118,29 @@
 
   $: {
     const optionsValidation = {
-      aesMode: () => selectedAlgorithm !== 'AES' || Boolean($dataState.aesMode),
+      aesMode: () =>
+        selectedAlgorithm !== CYPHER_ALGORITHM.aes ||
+        Boolean($dataState.aesMode),
       aesPadding: () =>
-        selectedAlgorithm !== 'AES' || Boolean($dataState.aesPadding),
+        selectedAlgorithm !== CYPHER_ALGORITHM.aes ||
+        Boolean($dataState.aesPadding),
       encoding: () => isHashingAlgorithm || Boolean($dataState.encoding),
       key: () => isHashingAlgorithm || Boolean($dataState.key),
       pbkdf2Iterations: () =>
-        selectedAlgorithm !== 'PBKDF2' || $dataState.pbkdf2Iterations >= 0,
+        selectedAlgorithm !== HASHING_ALGORITHM.pbkdf2 ||
+        $dataState.pbkdf2Iterations >= 0,
       pbkdf2KeySize: () =>
-        selectedAlgorithm !== 'PBKDF2' || $dataState.pbkdf2KeySize >= 0,
+        selectedAlgorithm !== HASHING_ALGORITHM.pbkdf2 ||
+        $dataState.pbkdf2KeySize >= 0,
       pbkdf2Salt: () =>
-        selectedAlgorithm !== 'PBKDF2' || Boolean($dataState.pbkdf2Salt),
+        selectedAlgorithm !== HASHING_ALGORITHM.pbkdf2 ||
+        Boolean($dataState.pbkdf2Salt),
       rc4DropDrop: () =>
-        selectedAlgorithm !== 'RC4Drop' || $dataState.rc4DropDrop >= 0,
+        selectedAlgorithm !== CYPHER_ALGORITHM.rc4Drop ||
+        $dataState.rc4DropDrop >= 0,
       sha3OutputLength: () =>
-        selectedAlgorithm !== 'SHA3' || $dataState.sha3OutputLength >= 0,
+        selectedAlgorithm !== HASHING_ALGORITHM.sha3 ||
+        $dataState.sha3OutputLength >= 0,
       standard: () => Boolean($dataState.standard),
     };
 
@@ -135,20 +153,20 @@
     let cfg = {};
 
     switch (selectedAlgorithm) {
-      case 'AES':
+      case CYPHER_ALGORITHM.aes:
         cfg = {
           mode: CryptoJS.mode[$dataState.aesMode],
           padding: CryptoJS.pad[$dataState.aesPadding],
         };
 
         break;
-      case 'SHA3':
+      case HASHING_ALGORITHM.sha3:
         cfg = {
           outputLength: $dataState.sha3OutputLength,
         };
 
         break;
-      case 'PBKDF2':
+      case HASHING_ALGORITHM.pbkdf2:
         cfg = {
           ...($dataState.pbkdf2Iterations >= 0 && {
             iterations: $dataState.pbkdf2Iterations,
@@ -159,7 +177,7 @@
         };
 
         break;
-      case 'RC4Drop':
+      case CYPHER_ALGORITHM.rc4Drop:
         cfg = {
           drop: $dataState.rc4DropDrop,
         };
@@ -172,24 +190,20 @@
     let args = [];
 
     switch (selectedAlgorithm) {
-      case 'DES':
-      case 'HMAC':
-      case 'RC4':
-      case 'TripleDES':
+      case CYPHER_ALGORITHM.des:
+      case HASHING_ALGORITHM.hmac:
+      case CYPHER_ALGORITHM.rc4:
+      case CYPHER_ALGORITHM.tripleDes:
         args = [message, $dataState.key];
         break;
-      case 'SHA3':
+      case HASHING_ALGORITHM.sha3:
         args = [message, !isObjectEmpty(cfg) && cfg];
         break;
-      case 'PBKDF2':
-        args = [
-          message,
-          $dataState.pbkdf2Salt,
-          !isObjectEmpty(cfg) && cfg,
-        ];
+      case HASHING_ALGORITHM.pbkdf2:
+        args = [message, $dataState.pbkdf2Salt, !isObjectEmpty(cfg) && cfg];
         break;
-      case 'AES':
-      case 'RC4Drop':
+      case CYPHER_ALGORITHM.aes:
+      case CYPHER_ALGORITHM.rc4Drop:
         args = [message, $dataState.key, !isObjectEmpty(cfg) && cfg];
         break;
       default:
@@ -202,10 +216,10 @@
 
   const handleAlgorithmChange = () => {
     switch (selectedAlgorithm) {
-      case 'HMAC':
+      case HASHING_ALGORITHM.hmac:
         variantItems = hmacVariantItems;
         break;
-      case 'SHA2':
+      case HASHING_ALGORITHM.sha2:
         variantItems = sha2VariantItems;
         break;
       default:
@@ -216,9 +230,9 @@
         break;
     }
 
-    const firstVariant = variantItems[0];
-    if (firstVariant)
-      $dataState.standard = selectedVariant = firstVariant.value;
+    const firstVariantItem = variantItems[0];
+    if (firstVariantItem)
+      $dataState.standard = selectedVariant = firstVariantItem.value;
   };
 
   const handleDecryptClick = () => {
@@ -273,7 +287,6 @@
       selectedAlgorithm = $dataState.standard;
       return;
     }
-    console.log(selectedAlgorithm);
 
     const isHmacVariant = hmacVariantItems.some(
       (hmacVariantItem) => hmacVariantItem.value === $dataState.standard
@@ -286,8 +299,8 @@
     const isVariant = isHmacVariant || isSha2Variant;
     if (isVariant) selectedVariant = $dataState.standard;
 
-    if (isHmacVariant) selectedAlgorithm = 'HMAC';
-    else if (isSha2Variant) selectedAlgorithm = 'SHA2';
+    if (isHmacVariant) selectedAlgorithm = HASHING_ALGORITHM.hmac;
+    else if (isSha2Variant) selectedAlgorithm = HASHING_ALGORITHM.sha2;
   });
 </script>
 
@@ -297,45 +310,50 @@
       <div>
         <Label>Algorithm</Label>
         <Select
+          clearable={false}
+          groupBy={(item) => item.group}
           items={algorithmItems}
           required
-          title="Algorithm"
-          bind:value={selectedAlgorithm}
+          showChevron
+          bind:justValue={selectedAlgorithm}
           on:change={handleAlgorithmChange}
         />
       </div>
       <div>
         <Label>Variant</Label>
         <Select
+          clearable={false}
           disabled={!hasVariant}
           items={variantItems}
           required
-          title="Variant"
-          bind:value={selectedVariant}
+          showChevron={hasVariant}
+          bind:justValue={selectedVariant}
           on:change={handleVariantChange}
         />
       </div>
-      {#if selectedAlgorithm === 'AES'}
+      {#if selectedAlgorithm === CYPHER_ALGORITHM.aes}
         <div>
           <Label>Mode</Label>
           <Select
+            clearable={false}
             items={aesModeItems}
             required
-            title="Mode"
-            bind:value={$dataState.aesMode}
+            showChevron
+            bind:justValue={$dataState.aesMode}
           />
         </div>
         <div>
           <Label>Padding</Label>
           <Select
+            clearable={false}
             items={aesPaddingItems}
             required
-            title="Padding"
-            bind:value={$dataState.aesPadding}
+            showChevron
+            bind:justValue={$dataState.aesPadding}
           />
         </div>
       {/if}
-      {#if selectedAlgorithm === 'PBKDF2'}
+      {#if selectedAlgorithm === HASHING_ALGORITHM.pbkdf2}
         <div>
           <Label>Iterations</Label>
           <Input
@@ -353,20 +371,21 @@
           <Input required type="text" bind:value={$dataState.pbkdf2Salt} />
         </div>
       {/if}
-      {#if selectedAlgorithm === 'RC4Drop'}
+      {#if selectedAlgorithm === CYPHER_ALGORITHM.rc4Drop}
         <div class="col-span-2">
           <Label>Drop</Label>
           <Input required type="number" bind:value={$dataState.rc4DropDrop} />
         </div>
       {/if}
-      {#if selectedAlgorithm === 'SHA3'}
+      {#if selectedAlgorithm === HASHING_ALGORITHM.sha3}
         <div class="col-span-2">
           <Label>Output Length</Label>
           <Select
+            clearable={false}
             items={sha3OutputLengthItems}
             required
-            title="Output Length"
-            bind:value={$dataState.sha3OutputLength}
+            showChevron
+            bind:justValue={$dataState.sha3OutputLength}
           />
         </div>
       {/if}
@@ -380,10 +399,11 @@
         <div>
           <Label>Encoding</Label>
           <Select
+            clearable={false}
             items={encodingItems}
             required
-            title="Encoding"
-            bind:value={$dataState.encoding}
+            showChevron
+            bind:justValue={$dataState.encoding}
           />
         </div>
         <div>
