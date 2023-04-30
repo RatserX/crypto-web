@@ -9,7 +9,7 @@ export default mergeConfig(
     test: {
       environment: 'jsdom',
       globals: true,
-      include: ['**/*.integration.test.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+      include: ['**/*.test.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     },
   })
 );

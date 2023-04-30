@@ -8,7 +8,7 @@ export const HASHING_ALGORITHM = {
   pbkdf2: 'PBKDF2',
 };
 
-export const CYPHER_ALGORITHM = {
+export const CIPHER_ALGORITHM = {
   aes: 'AES',
   des: 'DES',
   tripleDes: 'TripleDES',

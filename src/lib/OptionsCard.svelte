@@ -10,13 +10,13 @@
   import {
     AES_MODE,
     AES_PADDING,
-    CYPHER_ALGORITHM,
+    CIPHER_ALGORITHM,
     ENCODING,
     HASHING_ALGORITHM,
     HMAC_VARIANT,
     SHA2_VARIANT,
   } from '../utils/constants';
-  import { isObjectEmpty } from '../utils/helpers';
+  import { getCryptoArguments } from '../utils/helpers';
 
   const hashingAlgorithmItems = [
     { group: 'Hashing', label: 'MD5', value: HASHING_ALGORITHM.md5 },
@@ -32,20 +32,20 @@
     { group: 'Hashing', label: 'PBKDF2', value: HASHING_ALGORITHM.pbkdf2 },
   ];
 
-  const cypherAlgorithmItems = [
-    { group: 'Cyphers', label: 'AES', value: CYPHER_ALGORITHM.aes },
-    { group: 'Cyphers', label: 'DES', value: CYPHER_ALGORITHM.des },
+  const cipherAlgorithmItems = [
+    { group: 'Ciphers', label: 'AES', value: CIPHER_ALGORITHM.aes },
+    { group: 'Ciphers', label: 'DES', value: CIPHER_ALGORITHM.des },
     {
-      group: 'Cyphers',
+      group: 'Ciphers',
       label: 'Triple DES',
-      value: CYPHER_ALGORITHM.tripleDes,
+      value: CIPHER_ALGORITHM.tripleDes,
     },
-    { group: 'Cyphers', label: 'Rabbit', value: CYPHER_ALGORITHM.rabbit },
-    { group: 'Cyphers', label: 'RC4', value: CYPHER_ALGORITHM.rc4 },
-    { group: 'Cyphers', label: 'RC4Drop', value: CYPHER_ALGORITHM.rc4Drop },
+    { group: 'Ciphers', label: 'Rabbit', value: CIPHER_ALGORITHM.rabbit },
+    { group: 'Ciphers', label: 'RC4', value: CIPHER_ALGORITHM.rc4 },
+    { group: 'Ciphers', label: 'RC4Drop', value: CIPHER_ALGORITHM.rc4Drop },
   ];
 
-  const algorithmItems = hashingAlgorithmItems.concat(cypherAlgorithmItems);
+  const algorithmItems = hashingAlgorithmItems.concat(cipherAlgorithmItems);
 
   const hmacVariantItems = [
     { label: 'HmacMD5', value: HMAC_VARIANT.hmacMd5 },
@@ -108,8 +108,8 @@
   let isValid = false;
 
   $: hasVariant = Boolean(variantItems.length);
-  $: isCypherAlgorithm = Object.values(cypherAlgorithmItems).some(
-    (cypherAlgorithmItem) => cypherAlgorithmItem.value === selectedAlgorithm
+  $: isCipherAlgorithm = Object.values(cipherAlgorithmItems).some(
+    (cipherAlgorithmItem) => cipherAlgorithmItem.value === selectedAlgorithm
   );
 
   $: isHashingAlgorithm = Object.values(hashingAlgorithmItems).some(
@@ -119,10 +119,10 @@
   $: {
     const optionsValidation = {
       aesMode: () =>
-        selectedAlgorithm !== CYPHER_ALGORITHM.aes ||
+        selectedAlgorithm !== CIPHER_ALGORITHM.aes ||
         Boolean($dataState.aesMode),
       aesPadding: () =>
-        selectedAlgorithm !== CYPHER_ALGORITHM.aes ||
+        selectedAlgorithm !== CIPHER_ALGORITHM.aes ||
         Boolean($dataState.aesPadding),
       encoding: () => isHashingAlgorithm || Boolean($dataState.encoding),
       key: () => isHashingAlgorithm || Boolean($dataState.key),
@@ -136,7 +136,7 @@
         selectedAlgorithm !== HASHING_ALGORITHM.pbkdf2 ||
         Boolean($dataState.pbkdf2Salt),
       rc4DropDrop: () =>
-        selectedAlgorithm !== CYPHER_ALGORITHM.rc4Drop ||
+        selectedAlgorithm !== CIPHER_ALGORITHM.rc4Drop ||
         $dataState.rc4DropDrop >= 0,
       sha3OutputLength: () =>
         selectedAlgorithm !== HASHING_ALGORITHM.sha3 ||
@@ -147,71 +147,6 @@
     isValid = Object.values(optionsValidation).every((optionsValidationValue) =>
       optionsValidationValue()
     );
-  }
-
-  const getCryptoArguments = (message) => {
-    let cfg = {};
-
-    switch (selectedAlgorithm) {
-      case CYPHER_ALGORITHM.aes:
-        cfg = {
-          mode: CryptoJS.mode[$dataState.aesMode],
-          padding: CryptoJS.pad[$dataState.aesPadding],
-        };
-
-        break;
-      case HASHING_ALGORITHM.sha3:
-        cfg = {
-          outputLength: $dataState.sha3OutputLength,
-        };
-
-        break;
-      case HASHING_ALGORITHM.pbkdf2:
-        cfg = {
-          ...($dataState.pbkdf2Iterations >= 0 && {
-            iterations: $dataState.pbkdf2Iterations,
-          }),
-          ...($dataState.pbkdf2KeySize >= 0 && {
-            keySize: $dataState.pbkdf2KeySize,
-          }),
-        };
-
-        break;
-      case CYPHER_ALGORITHM.rc4Drop:
-        cfg = {
-          drop: $dataState.rc4DropDrop,
-        };
-
-        break;
-      default:
-        break;
-    }
-
-    let args = [];
-
-    switch (selectedAlgorithm) {
-      case CYPHER_ALGORITHM.des:
-      case HASHING_ALGORITHM.hmac:
-      case CYPHER_ALGORITHM.rc4:
-      case CYPHER_ALGORITHM.tripleDes:
-        args = [message, $dataState.key];
-        break;
-      case HASHING_ALGORITHM.sha3:
-        args = [message, !isObjectEmpty(cfg) && cfg];
-        break;
-      case HASHING_ALGORITHM.pbkdf2:
-        args = [message, $dataState.pbkdf2Salt, !isObjectEmpty(cfg) && cfg];
-        break;
-      case CYPHER_ALGORITHM.aes:
-      case CYPHER_ALGORITHM.rc4Drop:
-        args = [message, $dataState.key, !isObjectEmpty(cfg) && cfg];
-        break;
-      default:
-        args = [message];
-        break;
-    }
-
-    return args;
   };
 
   const handleAlgorithmChange = () => {
@@ -236,7 +171,7 @@
   };
 
   const handleDecryptClick = () => {
-    const args = getCryptoArguments($inputState);
+    const args = getCryptoArguments($dataState, $inputState);
     const decrypted = CryptoJS[$dataState.standard]['decrypt'].apply(
       null,
       args
@@ -247,7 +182,7 @@
 
   const handleEncryptClick = () => {
     const message = CryptoJS.enc[$dataState.encoding].parse($inputState);
-    const args = getCryptoArguments(message);
+    const args = getCryptoArguments($dataState, message);
     const encrypted = CryptoJS[$dataState.standard]['encrypt'].apply(
       null,
       args
@@ -257,14 +192,14 @@
   };
 
   const handleHashClick = () => {
-    const args = getCryptoArguments($inputState);
+    const args = getCryptoArguments($dataState, $inputState);
     const hashed = CryptoJS[$dataState.standard].apply(null, args);
 
     $outputState = hashed.toString();
   };
 
   const handleValidateClick = () => {
-    const args = getCryptoArguments($inputState);
+    const args = getCryptoArguments($dataState, $inputState);
     const hashed = CryptoJS[$dataState.standard].apply(null, args);
 
     if ($dataState.hash === hashed.toString()) {
@@ -313,6 +248,7 @@
           clearable={false}
           groupBy={(item) => item.group}
           items={algorithmItems}
+          name="algorithm"
           required
           showChevron
           bind:justValue={selectedAlgorithm}
@@ -325,31 +261,23 @@
           clearable={false}
           disabled={!hasVariant}
           items={variantItems}
+          name="variant"
           required
           showChevron={hasVariant}
           bind:justValue={selectedVariant}
           on:change={handleVariantChange}
         />
       </div>
-      {#if selectedAlgorithm === CYPHER_ALGORITHM.aes}
-        <div>
-          <Label>Mode</Label>
+      {#if selectedAlgorithm === HASHING_ALGORITHM.sha3}
+        <div class="col-span-2">
+          <Label>Output Length</Label>
           <Select
             clearable={false}
-            items={aesModeItems}
+            items={sha3OutputLengthItems}
+            name="sha3-output-length"
             required
             showChevron
-            bind:justValue={$dataState.aesMode}
-          />
-        </div>
-        <div>
-          <Label>Padding</Label>
-          <Select
-            clearable={false}
-            items={aesPaddingItems}
-            required
-            showChevron
-            bind:justValue={$dataState.aesPadding}
+            bind:justValue={$dataState.sha3OutputLength}
           />
         </div>
       {/if}
@@ -371,22 +299,34 @@
           <Input required type="text" bind:value={$dataState.pbkdf2Salt} />
         </div>
       {/if}
-      {#if selectedAlgorithm === CYPHER_ALGORITHM.rc4Drop}
+      {#if selectedAlgorithm === CIPHER_ALGORITHM.aes}
+        <div>
+          <Label>Mode</Label>
+          <Select
+            clearable={false}
+            items={aesModeItems}
+            name="aes-mode"
+            required
+            showChevron
+            bind:justValue={$dataState.aesMode}
+          />
+        </div>
+        <div>
+          <Label>Padding</Label>
+          <Select
+            clearable={false}
+            items={aesPaddingItems}
+            name="aes-padding"
+            required
+            showChevron
+            bind:justValue={$dataState.aesPadding}
+          />
+        </div>
+      {/if}
+      {#if selectedAlgorithm === CIPHER_ALGORITHM.rc4Drop}
         <div class="col-span-2">
           <Label>Drop</Label>
           <Input required type="number" bind:value={$dataState.rc4DropDrop} />
-        </div>
-      {/if}
-      {#if selectedAlgorithm === HASHING_ALGORITHM.sha3}
-        <div class="col-span-2">
-          <Label>Output Length</Label>
-          <Select
-            clearable={false}
-            items={sha3OutputLengthItems}
-            required
-            showChevron
-            bind:justValue={$dataState.sha3OutputLength}
-          />
         </div>
       {/if}
       {#if isHashingAlgorithm}
@@ -395,23 +335,26 @@
           <Input type="text" bind:value={$dataState.hash} />
         </div>
       {/if}
-      {#if isCypherAlgorithm}
-        <div>
+      {#if isCipherAlgorithm}
+        <div class="col-span-2">
           <Label>Encoding</Label>
           <Select
             clearable={false}
             items={encodingItems}
+            name="encoding"
             required
             showChevron
             bind:justValue={$dataState.encoding}
           />
         </div>
-        <div>
+      {/if}
+      {#if isCipherAlgorithm || selectedAlgorithm === HASHING_ALGORITHM.hmac}
+        <div class="col-span-2">
           <Label>Key</Label>
           <Input type="text" bind:value={$dataState.key} />
         </div>
       {/if}
-      {#if isCypherAlgorithm || isHashingAlgorithm}
+      {#if isCipherAlgorithm || isHashingAlgorithm}
         <div class="col-span-2">
           <ButtonGroup class="w-full">
             {#if isHashingAlgorithm}
