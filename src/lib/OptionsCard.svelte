@@ -147,7 +147,7 @@
     isValid = Object.values(optionsValidation).every((optionsValidationValue) =>
       optionsValidationValue()
     );
-  };
+  }
 
   const handleAlgorithmChange = () => {
     switch (selectedAlgorithm) {

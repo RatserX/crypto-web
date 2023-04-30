@@ -1,28 +1,22 @@
-/* global beforeEach, expect, test */
-import '@testing-library/jest-dom';
+/* global expect, test */
 
-import { act, fireEvent, render, screen } from '@testing-library/svelte';
 import CryptoJS from 'crypto-js';
 import { describe } from 'vitest';
 
-import { inputState } from '../stores/input-store';
-import { dataState } from '../stores/options-store';
 import {
   AES_MODE,
   AES_PADDING,
   CIPHER_ALGORITHM,
   ENCODING,
   HASHING_ALGORITHM,
+  HMAC_VARIANT,
+  SHA2_VARIANT,
 } from '../utils/constants';
 import {
   getCryptoArguments,
   getRandomNumber,
   getRandomString,
 } from '../utils/helpers';
-
-import Layout from './Layout.svelte';
-
-const message = getRandomString(100);
 
 const createCiphersCases = () => {
   const aesModes = Object.values(AES_MODE);
@@ -92,6 +86,8 @@ const createCiphersCases = () => {
 
 const createHashingCases = () => {
   const hashingAlgorithms = Object.values(HASHING_ALGORITHM);
+  const hmacVariants = Object.values(HMAC_VARIANT);
+  const sha2Variants = Object.values(SHA2_VARIANT);
 
   const message = getRandomString(100);
   let cases = [];
@@ -102,6 +98,18 @@ const createHashingCases = () => {
     };
 
     switch (hashingAlgorithm) {
+      case HASHING_ALGORITHM.sha2: {
+        sha2Variants.forEach((sha2Variant) => {
+          const additionalData = {
+            ...data,
+            standard: sha2Variant,
+          };
+
+          cases.push([additionalData, message]);
+        });
+
+        break;
+      }
       case HASHING_ALGORITHM.sha3: {
         const additionalData = {
           ...data,
@@ -112,12 +120,16 @@ const createHashingCases = () => {
         break;
       }
       case HASHING_ALGORITHM.hmac: {
-        const additionalData = {
-          ...data,
-          key: getRandomString(5),
-        };
+        hmacVariants.forEach((hmacVariant) => {
+          const additionalData = {
+            ...data,
+            key: getRandomString(5),
+            standard: hmacVariant,
+          };
 
-        cases.push([additionalData, message]);
+          cases.push([additionalData, message]);
+        });
+
         break;
       }
       case HASHING_ALGORITHM.pbkdf2: {
@@ -140,88 +152,28 @@ const createHashingCases = () => {
   return cases;
 };
 
-const getInput = () => {
-  const inputTextarea = screen.getByRole('textbox', { name: /input/i });
-  return inputTextarea.getAttribute('value');
-};
+describe('the cipher algorithms', () => {
+  test.each(createCiphersCases())('.decrypt(%o, %s)', (data, message) => {
+    const args = getCryptoArguments(data, message);
 
-const setInput = (value) => {
-  const inputTextarea = screen.getByRole('textbox', { name: /input/i });
-  inputTextarea.setAttribute('value', value);
-};
-
-beforeEach(() => {
-  dataState.reset();
-  inputState.reset();
-});
-
-test('testing', () => {
-  console.log('test')
-  console.log(createCiphersCases())
-  console.log(createHashingCases())
-})
-
-describe('ciphers', () => {
-  test.each(createCiphersCases())(
-    '.encrypt(%o, %s)',
-    (data, message) => {
-      const parsedMessage = CryptoJS.enc[data.encoding].parse(message);
-      const args = getCryptoArguments(data, parsedMessage);
-      const encrypted = CryptoJS[data.standard]['encrypt'].apply(null, args);
-
-      expect(encrypted).not.toThrow();
-    }
-  );
-});
-
-describe('hashing', () => {
-  test.each(createHashingCases())(
-    '.hash(%o, %s)',
-    (data, message) => {
-      const args = getCryptoArguments(data, message);
-      const hashed = CryptoJS[data.standard].apply(null, args);
-
-      expect(hashed.toString()).not.toThrow();
-    }
-  );
-
-  test('MD5 hash output', async () => {
-    render(Layout);
-
-    const inputTextarea = screen.getByRole('textbox', { name: /input/i });
-    act(() => fireEvent.input(inputTextarea, { target: { value: message } }));
-
-    console.log('testestestsetset123');
-    console.log(inputState.get());
-    console.log(inputTextarea.value);
-
-    setInput(message);
-    dataState.update((data) => ({
-      ...data,
-      standard: HASHING_ALGORITHM.md5,
-    }));
-
-    const data = dataState.get();
-    const input = getInput();
-    const output = CryptoJS[data.standard](input);
-    const hash = CryptoJS.MD5(message);
-
-    expect(output.toString()).toBe(hash.toString());
+    expect(() =>
+      CryptoJS[data.standard]['decrypt'].apply(null, args)
+    ).not.toThrowError();
   });
 
-  test('MD5 validate output', async () => {
-    render(Layout);
-    setInput(message);
-    dataState.update((data) => ({
-      ...data,
-      hash: '098f6bcd4621d373cade4e832627b4f6',
-      standard: HASHING_ALGORITHM.md5,
-    }));
+  test.each(createCiphersCases())('.encrypt(%o, %s)', (data, message) => {
+    const parsedMessage = CryptoJS.enc[data.encoding].parse(message);
+    const args = getCryptoArguments(data, parsedMessage);
 
-    const data = dataState.get();
-    const input = getInput();
-    const output = CryptoJS[data.standard](input);
+    expect(() =>
+      CryptoJS[data.standard]['encrypt'].apply(null, args)
+    ).not.toThrowError();
+  });
+});
 
-    expect(output.toString()).toBe(data.hash);
+describe('the hashing algorithms', () => {
+  test.each(createHashingCases())('.hash(%o, %s)', (data, message) => {
+    const args = getCryptoArguments(data, message);
+    expect(() => CryptoJS[data.standard].apply(null, args)).not.toThrow();
   });
 });

@@ -16,6 +16,6 @@ describe('input', () => {
     act(() => fireEvent.input(inputTextarea, { target: { value: 'test' } }));
 
     const input = inputState.get();
-    expect(screen.getByDisplayValue(input)).toHaveValue('value');
+    expect(screen.getByDisplayValue(input)).toHaveValue('test');
   });
 });
