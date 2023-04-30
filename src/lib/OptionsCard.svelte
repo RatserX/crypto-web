@@ -105,41 +105,59 @@
   let selectedAlgorithm;
   let selectedVariant;
 
+  let selectedAesMode = aesModeItems.find(
+    (aesModeItem) => aesModeItem.value === $dataState.aesMode
+  );
+  let selectedAesPadding = aesPaddingItems.find(
+    (aesPaddingItem) => aesPaddingItem.value === $dataState.aesPadding
+  );
+  let selectedEncoding = encodingItems.find(
+    (encodingItem) => encodingItem.value === $dataState.encoding
+  );
+  let selectedSha3OutputLength = sha3OutputLengthItems.find(
+    (sha3OutputLengthItem) =>
+      sha3OutputLengthItem.value === $dataState.sha3OutputLength
+  );
+
   let isValid = false;
+
+  $: algorithm = selectedAlgorithm?.value;
+  $: variant = selectedVariant?.value;
+
+  $: $dataState.aesMode = selectedAesMode?.value;
+  $: $dataState.aesPadding = selectedAesPadding?.value;
+  $: $dataState.encoding = selectedEncoding?.value;
+  $: $dataState.sha3OutputLength = selectedSha3OutputLength?.value;
 
   $: hasVariant = Boolean(variantItems.length);
   $: isCipherAlgorithm = Object.values(cipherAlgorithmItems).some(
-    (cipherAlgorithmItem) => cipherAlgorithmItem.value === selectedAlgorithm
+    (cipherAlgorithmItem) => cipherAlgorithmItem.value === algorithm
   );
 
   $: isHashingAlgorithm = Object.values(hashingAlgorithmItems).some(
-    (hashingAlgorithmItem) => hashingAlgorithmItem.value === selectedAlgorithm
+    (hashingAlgorithmItem) => hashingAlgorithmItem.value === algorithm
   );
 
   $: {
     const optionsValidation = {
       aesMode: () =>
-        selectedAlgorithm !== CIPHER_ALGORITHM.aes ||
-        Boolean($dataState.aesMode),
+        algorithm !== CIPHER_ALGORITHM.aes || Boolean($dataState.aesMode),
       aesPadding: () =>
-        selectedAlgorithm !== CIPHER_ALGORITHM.aes ||
-        Boolean($dataState.aesPadding),
+        algorithm !== CIPHER_ALGORITHM.aes || Boolean($dataState.aesPadding),
       encoding: () => isHashingAlgorithm || Boolean($dataState.encoding),
       key: () => isHashingAlgorithm || Boolean($dataState.key),
       pbkdf2Iterations: () =>
-        selectedAlgorithm !== HASHING_ALGORITHM.pbkdf2 ||
+        algorithm !== HASHING_ALGORITHM.pbkdf2 ||
         $dataState.pbkdf2Iterations >= 0,
       pbkdf2KeySize: () =>
-        selectedAlgorithm !== HASHING_ALGORITHM.pbkdf2 ||
-        $dataState.pbkdf2KeySize >= 0,
+        algorithm !== HASHING_ALGORITHM.pbkdf2 || $dataState.pbkdf2KeySize >= 0,
       pbkdf2Salt: () =>
-        selectedAlgorithm !== HASHING_ALGORITHM.pbkdf2 ||
+        algorithm !== HASHING_ALGORITHM.pbkdf2 ||
         Boolean($dataState.pbkdf2Salt),
       rc4DropDrop: () =>
-        selectedAlgorithm !== CIPHER_ALGORITHM.rc4Drop ||
-        $dataState.rc4DropDrop >= 0,
+        algorithm !== CIPHER_ALGORITHM.rc4Drop || $dataState.rc4DropDrop >= 0,
       sha3OutputLength: () =>
-        selectedAlgorithm !== HASHING_ALGORITHM.sha3 ||
+        algorithm !== HASHING_ALGORITHM.sha3 ||
         $dataState.sha3OutputLength >= 0,
       standard: () => Boolean($dataState.standard),
     };
@@ -150,7 +168,7 @@
   }
 
   const handleAlgorithmChange = () => {
-    switch (selectedAlgorithm) {
+    switch (algorithm) {
       case HASHING_ALGORITHM.hmac:
         variantItems = hmacVariantItems;
         break;
@@ -158,7 +176,7 @@
         variantItems = sha2VariantItems;
         break;
       default:
-        $dataState.standard = selectedAlgorithm;
+        $dataState.standard = algorithm;
         selectedVariant = undefined;
         variantItems = [];
 
@@ -166,8 +184,10 @@
     }
 
     const firstVariantItem = variantItems[0];
-    if (firstVariantItem)
-      $dataState.standard = selectedVariant = firstVariantItem.value;
+    if (firstVariantItem) {
+      selectedVariant = firstVariantItem;
+      $dataState.standard = firstVariantItem.value;
+    }
   };
 
   const handleDecryptClick = () => {
@@ -210,32 +230,40 @@
   };
 
   const handleVariantChange = () => {
-    $dataState.standard = selectedVariant;
+    $dataState.standard = variant;
   };
 
   onMount(() => {
-    const isAlgorithm = algorithmItems.some(
+    if (!$dataState?.standard) return;
+
+    const defaultAlgorithm = algorithmItems.find(
       (algorithmItem) => algorithmItem.value === $dataState.standard
     );
 
-    if (isAlgorithm) {
-      selectedAlgorithm = $dataState.standard;
+    if (defaultAlgorithm) {
+      selectedAlgorithm = algorithm;
       return;
     }
 
-    const isHmacVariant = hmacVariantItems.some(
+    let defaultHmacVariant = hmacVariantItems.find(
       (hmacVariantItem) => hmacVariantItem.value === $dataState.standard
     );
 
-    const isSha2Variant = sha2VariantItems.some(
+    let defaultSha2Variant = sha2VariantItems.find(
       (sha2VariantItem) => sha2VariantItem.value === $dataState.standard
     );
 
-    const isVariant = isHmacVariant || isSha2Variant;
-    if (isVariant) selectedVariant = $dataState.standard;
-
-    if (isHmacVariant) selectedAlgorithm = HASHING_ALGORITHM.hmac;
-    else if (isSha2Variant) selectedAlgorithm = HASHING_ALGORITHM.sha2;
+    if (defaultHmacVariant) {
+      selectedVariant = defaultHmacVariant;
+      selectedAlgorithm = algorithmItems.find(
+        (algorithmItem) => algorithmItem.value === HASHING_ALGORITHM.hmac
+      );
+    } else if (defaultSha2Variant) {
+      selectedVariant = defaultSha2Variant;
+      selectedAlgorithm = algorithmItems.find(
+        (algorithmItem) => algorithmItem.value === HASHING_ALGORITHM.sha2
+      );
+    }
   });
 </script>
 
@@ -251,7 +279,7 @@
           name="algorithm"
           required
           showChevron
-          bind:justValue={selectedAlgorithm}
+          bind:value={selectedAlgorithm}
           on:change={handleAlgorithmChange}
         />
       </div>
@@ -264,11 +292,11 @@
           name="variant"
           required
           showChevron={hasVariant}
-          bind:justValue={selectedVariant}
+          bind:value={selectedVariant}
           on:change={handleVariantChange}
         />
       </div>
-      {#if selectedAlgorithm === HASHING_ALGORITHM.sha3}
+      {#if algorithm === HASHING_ALGORITHM.sha3}
         <div class="col-span-2">
           <Label>Output Length</Label>
           <Select
@@ -277,11 +305,11 @@
             name="sha3-output-length"
             required
             showChevron
-            bind:justValue={$dataState.sha3OutputLength}
+            bind:value={selectedSha3OutputLength}
           />
         </div>
       {/if}
-      {#if selectedAlgorithm === HASHING_ALGORITHM.pbkdf2}
+      {#if algorithm === HASHING_ALGORITHM.pbkdf2}
         <div>
           <Label>Iterations</Label>
           <Input
@@ -299,7 +327,7 @@
           <Input required type="text" bind:value={$dataState.pbkdf2Salt} />
         </div>
       {/if}
-      {#if selectedAlgorithm === CIPHER_ALGORITHM.aes}
+      {#if algorithm === CIPHER_ALGORITHM.aes}
         <div>
           <Label>Mode</Label>
           <Select
@@ -308,7 +336,7 @@
             name="aes-mode"
             required
             showChevron
-            bind:justValue={$dataState.aesMode}
+            bind:value={selectedAesMode}
           />
         </div>
         <div>
@@ -319,20 +347,14 @@
             name="aes-padding"
             required
             showChevron
-            bind:justValue={$dataState.aesPadding}
+            bind:value={selectedAesPadding}
           />
         </div>
       {/if}
-      {#if selectedAlgorithm === CIPHER_ALGORITHM.rc4Drop}
+      {#if algorithm === CIPHER_ALGORITHM.rc4Drop}
         <div class="col-span-2">
           <Label>Drop</Label>
           <Input required type="number" bind:value={$dataState.rc4DropDrop} />
-        </div>
-      {/if}
-      {#if isHashingAlgorithm}
-        <div class="col-span-2">
-          <Label>Hash</Label>
-          <Input type="text" bind:value={$dataState.hash} />
         </div>
       {/if}
       {#if isCipherAlgorithm}
@@ -344,14 +366,20 @@
             name="encoding"
             required
             showChevron
-            bind:justValue={$dataState.encoding}
+            bind:value={selectedEncoding}
           />
         </div>
       {/if}
-      {#if isCipherAlgorithm || selectedAlgorithm === HASHING_ALGORITHM.hmac}
+      {#if isCipherAlgorithm || algorithm === HASHING_ALGORITHM.hmac}
         <div class="col-span-2">
           <Label>Key</Label>
           <Input type="text" bind:value={$dataState.key} />
+        </div>
+      {/if}
+      {#if isHashingAlgorithm}
+        <div class="col-span-2">
+          <Label>Hash</Label>
+          <Input type="text" bind:value={$dataState.hash} />
         </div>
       {/if}
       {#if isCipherAlgorithm || isHashingAlgorithm}
