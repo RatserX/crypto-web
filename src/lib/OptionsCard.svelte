@@ -290,6 +290,7 @@
           disabled={!hasVariant}
           items={variantItems}
           name="variant"
+          placeholder=""
           required
           showChevron={hasVariant}
           bind:value={selectedVariant}
@@ -389,24 +390,32 @@
               <Button
                 class="w-full"
                 disabled={!isValid}
-                on:click={handleHashClick}>Hash</Button
+                on:click={handleHashClick}
               >
+                Hash
+              </Button>
               <Button
                 class="w-full"
                 disabled={!isValid}
-                on:click={handleValidateClick}>Validate</Button
+                on:click={handleValidateClick}
               >
+                Validate
+              </Button>
             {:else}
               <Button
                 class="w-full"
                 disabled={!isValid}
-                on:click={handleDecryptClick}>Decrypt</Button
+                on:click={handleDecryptClick}
               >
+                Decrypt
+              </Button>
               <Button
                 class="w-full"
                 disabled={!isValid}
-                on:click={handleEncryptClick}>Encrypt</Button
+                on:click={handleEncryptClick}
               >
+                Encrypt
+              </Button>
             {/if}
           </ButtonGroup>
         </div>
