@@ -9,6 +9,10 @@
 
 [![Buy me a coffee][buymeacoffee-image]][buymeacoffee-url]
 
+Single page application that allows users to cipher or hash texts using the algorithm implementations in the JavaScript library CryptoJS.
+
+View in [Github Pages](https://ratserx.github.io/crypto-web/)
+
 ## Recommended IDE Setup
 
 [VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
