@@ -105,6 +105,10 @@
     { label: '512', value: 512 },
   ];
 
+  const floatingConfig = {
+    placement: 'bottom',
+  };
+
   let selectedAlgorithm;
   let selectedVariant;
 
@@ -270,6 +274,7 @@
         <Label>Algorithm</Label>
         <Select
           clearable={false}
+          {floatingConfig}
           groupBy={(item) => item.group}
           items={algorithmItems}
           name="algorithm"
@@ -284,6 +289,7 @@
         <Select
           clearable={false}
           disabled={!hasVariant}
+          {floatingConfig}
           items={variantItems}
           name="variant"
           placeholder=""
@@ -298,6 +304,7 @@
           <Label>Output Length</Label>
           <Select
             clearable={false}
+            {floatingConfig}
             items={sha3OutputLengthItems}
             name="sha3-output-length"
             required
@@ -329,6 +336,7 @@
           <Label>Mode</Label>
           <Select
             clearable={false}
+            {floatingConfig}
             items={aesModeItems}
             name="aes-mode"
             required
@@ -340,6 +348,7 @@
           <Label>Padding</Label>
           <Select
             clearable={false}
+            {floatingConfig}
             items={aesPaddingItems}
             name="aes-padding"
             required
@@ -359,6 +368,7 @@
           <Label>Encoding</Label>
           <Select
             clearable={false}
+            {floatingConfig}
             items={encodingItems}
             name="encoding"
             required
