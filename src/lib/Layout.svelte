@@ -3,18 +3,19 @@
     Footer,
     FooterCopyright,
     FooterLinkGroup,
-    FooterLink,
     NavBrand,
     Navbar,
     Span,
+    FooterIcon,
   } from 'flowbite-svelte';
+  import { Buymeacoffee, Github } from 'svelte-simples';
 
   import InputCard from './InputCard.svelte';
   import OptionsCard from './OptionsCard.svelte';
   import OutputCard from './OutputCard.svelte';
 </script>
 
-<div class="h-screen overflow-auto pb-16">
+<div class="h-screen overflow-auto pb-24">
   <Navbar>
     <NavBrand>
       <Span>Crypto</Span>
@@ -42,10 +43,13 @@
 <Footer class="absolute bottom-0 left-0 z-20 w-full rounded-none">
   <FooterCopyright href="https://github.com/RatserX" by="Ratser" year={2023} />
   <FooterLinkGroup
-    ulClass="flex flex-wrap items-center mt-3 text-sm text-gray-500 dark:text-gray-400 sm:mt-0"
+    ulClass="flex flex-wrap items-center mt-3 text-sm text-gray-500 dark:text-gray-400 sm:mt-0 space-x-6"
   >
-    <FooterLink href="https://www.buymeacoffee.com/Ratser">
-      Found it helpful? Consider tipping me!
-    </FooterLink>
+    <FooterIcon href="https://github.com/RatserX/crypto-web">
+      <Github class="fill-current text-gray-400 hover:text-white" />
+    </FooterIcon>
+    <FooterIcon href="https://www.buymeacoffee.com/Ratser">
+      <Buymeacoffee class="fill-current text-gray-400 hover:text-white" />
+    </FooterIcon>
   </FooterLinkGroup>
 </Footer>
