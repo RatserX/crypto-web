@@ -11,7 +11,7 @@
 
 Single page application that allows users to cipher or hash texts using the cryptographic algorithms provided in the JavaScript library CryptoJS.
 
-View in [Github Pages](https://ratserx.github.io/crypto-web/)
+View in [Github Pages](https://ratserx.github.io/crypto-web/).
 
 ## Recommended IDE Setup
 
