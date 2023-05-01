@@ -16,7 +16,10 @@
     HMAC_VARIANT,
     SHA2_VARIANT,
   } from '../utils/constants';
-  import { getCryptoArguments } from '../utils/helpers';
+  import {
+    getAlgorithmFromStandard,
+    getCryptoArguments,
+  } from '../utils/helpers';
 
   const hashingAlgorithmItems = [
     { group: 'Hashing', label: 'MD5', value: HASHING_ALGORITHM.md5 },
@@ -169,11 +172,11 @@
 
   const handleAlgorithmChange = () => {
     switch (algorithm) {
-      case HASHING_ALGORITHM.hmac:
-        variantItems = hmacVariantItems;
-        break;
       case HASHING_ALGORITHM.sha2:
         variantItems = sha2VariantItems;
+        break;
+      case HASHING_ALGORITHM.hmac:
+        variantItems = hmacVariantItems;
         break;
       default:
         $dataState.standard = algorithm;
@@ -236,33 +239,26 @@
   onMount(() => {
     if (!$dataState?.standard) return;
 
-    const defaultAlgorithm = algorithmItems.find(
-      (algorithmItem) => algorithmItem.value === $dataState.standard
+    const standardAlgorithm = getAlgorithmFromStandard($dataState.standard);
+    selectedAlgorithm = algorithmItems.find(
+      (algorithmItem) => algorithmItem.value === standardAlgorithm
     );
 
-    if (defaultAlgorithm) {
-      selectedAlgorithm = algorithm;
-      return;
-    }
+    switch (standardAlgorithm) {
+      case HASHING_ALGORITHM.hmac:
+        selectedVariant = hmacVariantItems.find(
+          (hmacVariantItem) => hmacVariantItem.value === $dataState.standard
+        );
 
-    let defaultHmacVariant = hmacVariantItems.find(
-      (hmacVariantItem) => hmacVariantItem.value === $dataState.standard
-    );
+        break;
+      case HASHING_ALGORITHM.sha2:
+        selectedVariant = sha2VariantItems.find(
+          (sha2VariantItem) => sha2VariantItem.value === $dataState.standard
+        );
 
-    let defaultSha2Variant = sha2VariantItems.find(
-      (sha2VariantItem) => sha2VariantItem.value === $dataState.standard
-    );
-
-    if (defaultHmacVariant) {
-      selectedVariant = defaultHmacVariant;
-      selectedAlgorithm = algorithmItems.find(
-        (algorithmItem) => algorithmItem.value === HASHING_ALGORITHM.hmac
-      );
-    } else if (defaultSha2Variant) {
-      selectedVariant = defaultSha2Variant;
-      selectedAlgorithm = algorithmItems.find(
-        (algorithmItem) => algorithmItem.value === HASHING_ALGORITHM.sha2
-      );
+        break;
+      default:
+        break;
     }
   });
 </script>

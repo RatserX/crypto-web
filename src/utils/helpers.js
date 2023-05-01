@@ -9,12 +9,16 @@ import {
 
 // CryptoJS
 export const getAlgorithmFromStandard = (standard) => {
+  const cipherAlgorithms = Object.values(CIPHER_ALGORITHM);
+  const hashingAlgorithms = Object.values(HASHING_ALGORITHM);
   const hmacVariants = Object.values(HMAC_VARIANT);
   const sha2Variants = Object.values(SHA2_VARIANT);
 
+  const algorithms = cipherAlgorithms.concat(hashingAlgorithms);
+
   if (hmacVariants.includes(standard)) return HASHING_ALGORITHM.hmac;
   else if (sha2Variants.includes(standard)) return HASHING_ALGORITHM.sha2;
-  else return standard;
+  else return algorithms.find((algorithm) => algorithm === standard);
 };
 
 export const getCryptoArguments = (data, message) => {
