@@ -30,10 +30,10 @@
       library CryptoJS.
     </p>
     <div>
-      <OptionsCard />
+      <InputCard />
     </div>
     <div>
-      <InputCard />
+      <OptionsCard />
     </div>
     <div class="md:col-span-2">
       <OutputCard />
