@@ -44,6 +44,7 @@
 </Card>
 <Toast
   color="green"
+  divClass="w-full max-w-xs p-4 !fixed"
   params={{ y: 200 }}
   position="top-right"
   transition={fly}

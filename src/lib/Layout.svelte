@@ -15,16 +15,16 @@
   import OutputCard from './OutputCard.svelte';
 </script>
 
-<div class="lg:h-screen lg:overflow-auto lg:pb-16">
+<div class="md:h-screen md:overflow-auto md:pb-16">
   <Navbar>
     <NavBrand>
       <Span>Crypto</Span>
     </NavBrand>
   </Navbar>
   <div
-    class="grid grid-cols-1 lg:grid-cols-2 gap-4 px-8 lg:px-20 py-4 lg:py-10"
+    class="grid grid-cols-1 md:grid-cols-2 gap-4 px-8 md:px-20 py-4 md:py-10"
   >
-    <p class="lg:col-span-2 font-thin dark:text-white">
+    <p class="md:col-span-2 font-thin dark:text-white">
       Crypto is an online tool that tries to serve as a demo for all the
       standard and secure cryptographic algorithms provided in the JavaScript
       library CryptoJS.
@@ -35,12 +35,12 @@
     <div>
       <InputCard />
     </div>
-    <div class="lg:col-span-2">
+    <div class="md:col-span-2">
       <OutputCard />
     </div>
   </div>
 </div>
-<Footer class="lg:absolute lg:bottom-0 lg:left-0 z-20 w-full rounded-none">
+<Footer class="md:absolute md:bottom-0 md:left-0 z-20 w-full rounded-none">
   <FooterCopyright href="https://github.com/RatserX" by="Ratser" year={2023} />
   <FooterLinkGroup
     ulClass="flex flex-wrap items-center mt-3 text-sm text-gray-500 dark:text-gray-400 sm:mt-0 space-x-6"

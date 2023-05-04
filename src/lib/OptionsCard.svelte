@@ -270,7 +270,7 @@
 <Card class="lg:h-100" size="100%">
   <form>
     <div class="grid grid-cols-2 gap-4">
-      <div>
+      <div class="max-md:col-span-2">
         <Label>Algorithm</Label>
         <Select
           clearable={false}
@@ -284,7 +284,7 @@
           on:change={handleAlgorithmChange}
         />
       </div>
-      <div>
+      <div class="max-md:col-span-2">
         <Label>Variant</Label>
         <Select
           clearable={false}
@@ -332,7 +332,7 @@
         </div>
       {/if}
       {#if algorithm === CIPHER_ALGORITHM.aes}
-        <div>
+        <div class="max-md:col-span-2">
           <Label>Mode</Label>
           <Select
             clearable={false}
@@ -344,7 +344,7 @@
             bind:value={selectedAesMode}
           />
         </div>
-        <div>
+        <div class="max-md:col-span-2">
           <Label>Padding</Label>
           <Select
             clearable={false}
