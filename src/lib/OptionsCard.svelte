@@ -267,7 +267,7 @@
   });
 </script>
 
-<Card class="lg:h-100" size="100%">
+<Card class="lg:h-100" size={null}>
   <form>
     <div class="grid grid-cols-2 gap-4">
       <div class="max-md:col-span-2">
@@ -396,6 +396,7 @@
               <Button
                 class="w-full"
                 disabled={!isValid}
+                color="light"
                 on:click={handleHashClick}
               >
                 Hash
@@ -403,6 +404,7 @@
               <Button
                 class="w-full"
                 disabled={!isValid}
+                color="light"
                 on:click={handleValidateClick}
               >
                 Validate
@@ -411,6 +413,7 @@
               <Button
                 class="w-full"
                 disabled={!isValid}
+                color="light"
                 on:click={handleDecryptClick}
               >
                 Decrypt
@@ -418,6 +421,7 @@
               <Button
                 class="w-full"
                 disabled={!isValid}
+                color="light"
                 on:click={handleEncryptClick}
               >
                 Encrypt

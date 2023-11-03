@@ -31,14 +31,14 @@
   };
 </script>
 
-<Card class="h-full" size="100%">
+<Card class="h-full" size={null}>
   <Textarea
     rows={13}
     style="resize: none"
     title="Input"
     bind:value={$inputState}
   >
-    <Toolbar slot="header" embedded>
+    <Toolbar class="p-0" color="dark" slot="header" embedded>
       <Span>Input</Span>
       <ToolbarButton slot="end" on:click={handlePasteClick}>
         <Clipboard />
@@ -48,7 +48,6 @@
 </Card>
 <Toast
   color="red"
-  divClass="w-full max-w-xs p-4 !fixed"
   params={{ y: 200 }}
   position="top-right"
   transition={fly}

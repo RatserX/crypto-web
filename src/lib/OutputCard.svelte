@@ -26,7 +26,7 @@
   };
 </script>
 
-<Card size="100%">
+<Card size={null}>
   <Textarea
     disabled
     rows={7}
@@ -34,7 +34,7 @@
     title="Output"
     value={$outputState}
   >
-    <Toolbar slot="header" embedded>
+    <Toolbar class="p-0" color="dark" slot="header" embedded>
       <Span>Output</Span>
       <ToolbarButton slot="end" on:click={handleCopyClick}>
         <Document />
@@ -44,7 +44,6 @@
 </Card>
 <Toast
   color="green"
-  divClass="w-full max-w-xs p-4 !fixed"
   params={{ y: 200 }}
   position="top-right"
   transition={fly}

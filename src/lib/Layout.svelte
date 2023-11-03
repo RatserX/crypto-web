@@ -40,7 +40,10 @@
     </div>
   </div>
 </div>
-<Footer class="md:absolute md:bottom-0 md:left-0 z-20 w-full rounded-none">
+<Footer
+  class="md:absolute md:bottom-0 md:left-0 z-20 w-full rounded-none"
+  footerType="default"
+>
   <FooterCopyright href="https://github.com/RatserX" by="Ratser" year={2023} />
   <FooterLinkGroup
     ulClass="flex flex-wrap items-center mt-3 text-sm text-gray-500 dark:text-gray-400 sm:mt-0 space-x-6"
