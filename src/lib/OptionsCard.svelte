@@ -113,17 +113,17 @@
   let selectedVariant;
 
   let selectedAesMode = aesModeItems.find(
-    (aesModeItem) => aesModeItem.value === $dataState.aesMode
+    (aesModeItem) => aesModeItem.value === $dataState.aesMode,
   );
   let selectedAesPadding = aesPaddingItems.find(
-    (aesPaddingItem) => aesPaddingItem.value === $dataState.aesPadding
+    (aesPaddingItem) => aesPaddingItem.value === $dataState.aesPadding,
   );
   let selectedEncoding = encodingItems.find(
-    (encodingItem) => encodingItem.value === $dataState.encoding
+    (encodingItem) => encodingItem.value === $dataState.encoding,
   );
   let selectedSha3OutputLength = sha3OutputLengthItems.find(
     (sha3OutputLengthItem) =>
-      sha3OutputLengthItem.value === $dataState.sha3OutputLength
+      sha3OutputLengthItem.value === $dataState.sha3OutputLength,
   );
 
   let isValid = false;
@@ -138,11 +138,11 @@
 
   $: hasVariant = Boolean(variantItems.length);
   $: isCipherAlgorithm = Object.values(cipherAlgorithmItems).some(
-    (cipherAlgorithmItem) => cipherAlgorithmItem.value === algorithm
+    (cipherAlgorithmItem) => cipherAlgorithmItem.value === algorithm,
   );
 
   $: isHashingAlgorithm = Object.values(hashingAlgorithmItems).some(
-    (hashingAlgorithmItem) => hashingAlgorithmItem.value === algorithm
+    (hashingAlgorithmItem) => hashingAlgorithmItem.value === algorithm,
   );
 
   $: {
@@ -170,7 +170,7 @@
     };
 
     isValid = Object.values(optionsValidation).every((optionsValidationValue) =>
-      optionsValidationValue()
+      optionsValidationValue(),
     );
   }
 
@@ -201,7 +201,7 @@
     const args = getCryptoArguments($dataState, $inputState);
     const decrypted = CryptoJS[$dataState.standard]['decrypt'].apply(
       null,
-      args
+      args,
     );
 
     $outputState = CryptoJS.enc[$dataState.encoding].stringify(decrypted);
@@ -212,7 +212,7 @@
     const args = getCryptoArguments($dataState, message);
     const encrypted = CryptoJS[$dataState.standard]['encrypt'].apply(
       null,
-      args
+      args,
     );
 
     $outputState = encrypted.toString();
@@ -245,19 +245,19 @@
 
     const standardAlgorithm = getAlgorithmFromStandard($dataState.standard);
     selectedAlgorithm = algorithmItems.find(
-      (algorithmItem) => algorithmItem.value === standardAlgorithm
+      (algorithmItem) => algorithmItem.value === standardAlgorithm,
     );
 
     switch (standardAlgorithm) {
       case HASHING_ALGORITHM.hmac:
         selectedVariant = hmacVariantItems.find(
-          (hmacVariantItem) => hmacVariantItem.value === $dataState.standard
+          (hmacVariantItem) => hmacVariantItem.value === $dataState.standard,
         );
 
         break;
       case HASHING_ALGORITHM.sha2:
         selectedVariant = sha2VariantItems.find(
-          (sha2VariantItem) => sha2VariantItem.value === $dataState.standard
+          (sha2VariantItem) => sha2VariantItem.value === $dataState.standard,
         );
 
         break;

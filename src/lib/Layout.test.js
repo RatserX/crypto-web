@@ -157,7 +157,7 @@ describe('the cipher algorithms', () => {
     const args = getCryptoArguments(data, message);
 
     expect(() =>
-      CryptoJS[data.standard]['decrypt'].apply(null, args)
+      CryptoJS[data.standard]['decrypt'].apply(null, args),
     ).not.toThrowError();
   });
 
@@ -166,7 +166,7 @@ describe('the cipher algorithms', () => {
     const args = getCryptoArguments(data, parsedMessage);
 
     expect(() =>
-      CryptoJS[data.standard]['encrypt'].apply(null, args)
+      CryptoJS[data.standard]['encrypt'].apply(null, args),
     ).not.toThrowError();
   });
 });
